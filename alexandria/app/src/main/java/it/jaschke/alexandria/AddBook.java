@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.services.DownloadImage;
@@ -33,6 +32,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private final String EAN_CONTENT = "eanContent";
     private static final String SCAN_FORMAT = "scanFormat";
     private static final String SCAN_CONTENTS = "scanContents";
+    public static final int SCANNER_REQ_CODE = 1;
 
     private String mScanFormat = "Format:";
     private String mScanContents = "Contents:";
@@ -101,6 +101,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
+                Intent scannerIntent = new Intent(getActivity(), ScannerActivity.class);
+                startActivityForResult(scannerIntent, SCANNER_REQ_CODE);
 
             }
         });
@@ -133,6 +135,16 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     private void restartLoader() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == SCANNER_REQ_CODE) {
+            if(data != null) {
+                ean.setText(data.getStringExtra(ScannerActivity.BARCODE));
+            }
+        }
     }
 
     @Override

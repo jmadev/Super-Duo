@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -141,7 +143,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == SCANNER_REQ_CODE) {
-            if(data != null) {
+            if(data != null && hasInternetConnection()) {
                 ean.setText(data.getStringExtra(ScannerActivity.BARCODE));
             }
         }
@@ -214,5 +216,16 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         activity.setTitle(R.string.scan);
+    }
+
+    private boolean hasInternetConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isAvailable() && activeNetwork.isConnected()) {
+            return true;
+        } else
+            Toast.makeText(getActivity(), "No Internet connection, please check connectivity!", Toast.LENGTH_LONG).show();
+        return false;
     }
 }
